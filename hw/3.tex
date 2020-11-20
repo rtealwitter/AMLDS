@@ -1,0 +1,280 @@
+% chktex-file 46
+% chktex-file 3
+
+\section*{Problem 1}
+\textbf{Collaborators:} None.
+\medskip
+
+\begin{enumerate}
+    \item Using the gradient descent algorithm
+    we analyzed in class and rearranging as described in
+    the problem set up, we can get a vector $y^{(i)}$
+    such that
+    \begin{align}
+        y^{(i)} - y^* = (I - \frac{1}{\lambda_1}A^T A) (y^{(0)}-y^*)
+        \nonumber
+    \end{align}
+    in $O(ndi)$ time.
+    In order to get the desired $x^{(q)}$, we sum
+    with the proper coefficients for the polynomial we want:
+    \begin{align}
+        x^{(q)}-x^* &=
+        c_0(y^{(0)}-y^*) + c_1(y^{(1)}-y^*) + \cdots +
+        c_q(y^{(q)}-y^*) \nonumber \\
+        &=\left[ c_0(I) + c_1 (I - \frac{1}{\lambda_1}A^T A)
+        + \cdots + c_q (I - \frac{1}{\lambda_1}A^T A)^q
+        \right ] (y^{(0)}-y^*) \nonumber \\
+        &=p(I- \frac{1}{\lambda_1}A^T A)(x^{(0)}-x^*).
+        \nonumber
+    \end{align}
+    Notice that the initial starting vector $x^{(0)}=y^{(0)}$
+    and that the problem doesn't change so the optimal solution
+    $x^*=y^*$.
+    Thus we can substitute $(x^{(0)}-x^*)$ for $(y^{(0)}-y^*)$
+    between the second and third lines.
+    If we save each $y^{(i)}$ as we go and use it for the $i+1$th
+    iteration, we can calculate our $x^{(q)}$ in total
+    time $O(ndq)$.
+
+    \item Choose $\gamma = \lambda_d/\lambda_1$.
+    By Claim 4 in the Lanczos notes,
+    there is a degree $q=O(\sqrt{1/\gamma}\log(1/\epsilon))$
+    polynomial $p$ such that $p(1)=1$ and $|p(t)|\leq\epsilon$
+    for $0\leq t \leq 1-\gamma$.
+
+    We check that such a $p$ is the one we want.
+    Indeed, $p(1)=1$ tells us the coefficents sum to 1 which is
+    exactly what we want.
+    
+    The eigenvalues of $A^T A$ are $\lambda_1,\ldots,\lambda_d$
+    so the eigenvalues of $1/\lambda_1 A^T A$ are
+    $\lambda_1/\lambda_1, \ldots, \lambda_d/\lambda_1$
+    and the eigenvalues of $M=I-1/\lambda_1 A^T A$ are 
+    $1-\lambda_1/\lambda_1, \ldots, 1-\lambda_d/\lambda_1$.
+
+    Then the eigenvalues of $p(M)$ are
+    $p(1-\lambda_1/\lambda_1), \ldots, p(1-\lambda_d/\lambda_1)$.
+    To see this, observe that the $i$th term of $M$ for
+    $0\leq i \leq q$ is $c_i M^i = c_i V\Lambda^i V^T$ where
+    $M = V \Lambda V^T$.
+    So the $j$th eigenvalue of $M$ is
+    $p(1-\lambda_j/\lambda_1)$.
+
+    The smallest eigenvalue is $p(1-\lambda_1/\lambda_1)=p(0)$.
+    The top eigenvalue of $M$ is $p(1-\lambda_d/\lambda_1)$
+    since $\lambda_d \leq \lambda_j$ for all other eigenvalues
+    $\lambda_j$ of $A^T A$.
+    Sure enough $p(1-\lambda_d/\lambda_1) = p(1-\gamma) \leq \epsilon$.
+    This $p$ is the one we want!
+
+    \item 
+    In $q=O(\sqrt{\lambda_1/\lambda_d}\log(1/\epsilon))$
+    iterations of matrix multiplication, we can get a matrix
+    $p(I-1/\lambda_1 A^T A)$ with top eigenvalue bounded above
+    by $\epsilon$.
+\end{enumerate}
+
+\newpage
+\section*{Problem 2}
+\textbf{Collaborators:} Kelly Marshall.
+\medskip
+
+\begin{enumerate}
+    \item Define $f(x) = \tilde{\lambda} x^T x - x^T A^T A x$.
+    We want to show that $f(x)$ is a convex function.
+    Let $x,y \in \R^d$ and $s \in [0,1]$.
+    Then
+    \begin{align}
+        (1-s)f(x)+sf(y) &= (1-s)\tilde{\lambda} x^T x - (1-s)x^T A^T A x
+        + s\tilde{\lambda} y^T y - sy^T A^T A y \nonumber \\
+        \label{eq:convexmid}
+        &\geq (1-s)^2\tilde{\lambda} x^T x - (1-s)^2x^T A^T A x
+        + s^2\tilde{\lambda} y^T y - s^2y^T A^T A y
+    \end{align}
+    since $0 \leq s \leq 1$ and $f(x) \geq 0$ imply that
+    $(1-s)f(x) \geq (1-s)^2f(x)$ and $sf(y) \geq s^2f(y)$.
+    Notice that $f(x) \geq 0$ follows from the supposition
+    that $v_1$ is the $\arg \min$ of $f(x)$
+    since $v_1 A^T A v_1 = \lambda_1 \leq \tilde{\lambda}$
+    by assumption.
+    Continuing from \autoref{eq:convexmid},
+    \begin{align}
+        &= \tilde{\lambda} (1-s) x^T (1-s) x - (1-s)x^T A^T A (1-s)x
+        + \tilde{\lambda} s y^T s y - sy^T A^T A sy
+        &=f((1-s)x + s y)
+        \nonumber
+    \end{align}
+    by linearity.
+    Therefore $f(x)$ is convex.
+
+    To see that $S$ is not convex,
+    choose vectors $e_1$ and $e_2$ and scalar $1/2$.
+    Both $\norm{e_1}^2 = \norm{e_2}^2=1$ so
+    $e_1, e_2 \in S$ but
+    $\norm{1/2 e_1 +1/2 e_2}^2 = 1/4 + 1/4 = 1/2 < 1$
+    so the linear combination $1/2 e_1 +1/2 e_2 \notin S$.
+
+    \item To show that projected gradient descent
+    with $f(x)$ and $S$ is exactly equivalent to
+    the power method, we need to show that the update
+    rules are the same and the final vector
+    in the power method is the $\arg \min$
+    over all the vectors.
+
+    We can write
+    \begin{align}
+        f(x) = \tilde{\lambda}\sum_{i=1}^n x_i^2 
+        - \sum_{i=1}^n \left(\sum_{j=1}^d a_{i,j} x_j \right)^2
+        \nonumber
+    \end{align}
+    where $a_{i,}$ is the $i$th row of $A$.
+    Then
+    \begin{align}
+        \frac{\partial f}{\partial x_j}
+        &= 2 \tilde{\lambda} x_j - \sum_{i=1} 2a_{i,j} (a_{i,} \cdot x)
+        = 2 \tilde{\lambda} x_j - 2a_{,j}^T (A x)
+        \nonumber \\
+        \label{eq:gradient}
+        \nabla f(x) &=
+        2 \tilde{\lambda} x - 2 A^T A x.
+    \end{align}
+    For $x{(i)} - \eta \nabla f(x^{(i)}) = A^T (A z^{(i)})$,
+    we choose $\eta = 1/(2\tilde{\lambda})$.
+
+    To see that the projection step is the same as normalizing,
+    simply recall that $S$ is the set of vectors with 
+    norm greater than or equal to 1.
+
+    The $\arg \min$ returned by projected gradient descent
+    is the same as the final vector $z^{(T)}$ from the 
+    analysis in class that each $z$ moves closer and closer
+    to $v_1$.
+
+    \item
+    Define $g(x) = -(x^T A^T A x)/ (x^T x)$.
+    Then 
+    \begin{align}
+        \nabla g(x) &= 
+        - \frac{x^Tx2A^TAx - x^T A^T A x 2x}{(x^Tx)^2}
+        \nonumber \\ &=
+        \frac{2}{(x^Tx)^2}\left( x^TA^TAx x - x^T x A^T A x\right).
+        \nonumber
+    \end{align}
+
+    For any scaling $c$ and right singular vector
+    $v_i$,
+    $c v_i^TA^T A c v_i = c^2 \sigma_i^2$
+    and $A^T A v_i = c \sigma_i^2 v_i$.
+    Therefore $c^3 v_i^T A^T A v_i v_i = c^2 \sigma_i^2 c v_i
+    = c^3 v_i^T v A^T A v_i$
+    so $\nabla g(c v_i)=0$ and $cv_i$ must be a stationary point.
+    
+    To see that $g$ is non-convex, choose vectors $v_d$ and $v_1$.
+    Then
+    \begin{align}
+        g(v_d) - g(v_1) = -\sigma_d^2 + \sigma_1^2  > 0
+        = \nabla g(v_d)^T (v_d - v_1) \nonumber
+    \end{align}
+    so $g$ is not convex.
+
+    \item
+    Choose $z= v_1$.
+    Then
+    \begin{align}
+        g(v_i + tv_1) = -\frac{(v_i+tv_1)^TA^TA(v_i+tv_1)}
+        {\norm{v_i + tv_1}^2} = 
+        \frac{-\sigma_i^2 - t\sigma_1^2}
+        {1+t}
+        \nonumber
+    \end{align}
+    because of the orthonormal
+    property of $v_i$ and $v_1$.
+    Since $\sigma_1 > \cdots > \sigma_d$ by assumption,
+    \begin{align}
+        g(v_i + tv_1) = 
+        \frac{-\sigma_i^2 - t\sigma_1^2}{1+t}
+        < \frac{-\sigma_i^2 - t\sigma_i^2}{1+t}
+        = g(v_i).
+        \nonumber
+    \end{align}
+
+\end{enumerate}
+
+\newpage
+\section*{Problem 3}
+\textbf{Collaborators:} Indu Ramesh.
+\medskip
+
+\begin{enumerate}
+    \item We sum the rows and columns of $D$.
+    First observe that
+    \begin{align}
+        D_{i,j} &= \norm{x_i - x_j}^2 \nonumber \\
+        &= (x_i - x_j)^T (x_i - x_j) \nonumber \\
+        &= \norm{x_i}^2 + \norm{x_j}^2 - 2 x_j^T x_i \nonumber.
+    \end{align}
+    Then
+    \begin{align}
+        \sum_{j=1}^n \sum_{i=1}^n D_{i,j} &=
+        \sum_{j=1}^n \sum_{i=1}^n \norm{x_i}^2 + \norm{x_j}^2
+        - 2x_j^T x_i \nonumber \\
+        &= \sum_{j=1}^n \sum_{i=1}^n \norm{x_i}^2 +
+        \sum_{i=1}^n \sum_{j=1}^n \norm{x_j}^2 +
+        \sum_{j=1}^n -2 x_j^T \sum_{i=1}^n x_i \nonumber \\
+        &= 2n \sum_{i=1}^n \norm{x_i}^2
+        \nonumber
+    \end{align}
+    where we use the assumption that $\sum_{i=1}^n x_i$
+    is the all 0s vector.
+    Therefore $\sum_{i=1}^n \norm{x_i}^2 = ||D||_F^2 / (2n)$.
+    We simply iterate and sum over $D$ in time $O(n^2)$ where
+    $D$ is $n\times n$.
+
+    \item 
+    We begin by summing each row
+    \begin{align}
+        \norm{D_{i,}}^2 &= \sum_{j=1}^n \norm{x_i}^2 + \norm{x_j}^2
+        - 2 x_i^T x_j \nonumber \\
+        &= n \norm{x_i}^2 + \sum_{j=1}^n \norm{x_j}^2 - 0.
+        \nonumber
+    \end{align}
+    Then the difference of the sums of two rows yields
+    \begin{align}
+        \norm{D_{i,}}^2 - \norm{D_{k,}}^2 &= 
+        n (\norm{x_i}^2 - \norm{x_k}^2).
+        \nonumber
+    \end{align}
+    Fix $i$. We sum
+    \begin{align}
+        \sum_{k=1}^n D_{i,k} + \frac{\norm{D_{i,}}^2 - \norm{D_{k,}}^2}{n}
+        &= \sum_{k=1}^n 2 \norm{x_i}^2 - 2 x_{i}^Tx_k \nonumber \\
+        &= 2n \norm{x_i}^2 - 0.
+        \nonumber
+    \end{align} 
+    Therefore
+    \begin{align}
+        \frac{1}{2n}
+        \sum_{k=1}^n D_{i,k} + \frac{\norm{D_{i,}}^2 - \norm{D_{k,}}^2}{n}
+        = \norm{x_i}^2.
+        \nonumber
+    \end{align}
+    We calculate each $\norm{D_{i,}}^2$ in time $n$
+    then the summation over $k$ adds another factor of $n$.
+    Therefore we can calculate $\norm{x_i}^2$ in $O(n^2)$ time.
+
+    \item We define a $n \times n$ matrix $G$ where entry
+    $G_{i,j} = x_i^T x_j$.
+    With the set of $\norm{x_i}^2$ terms from the previous problem,
+    we can calculate $x_i^T x_j = (\norm{x_i}^2 + \norm{x_j}^2 - D_{i,j})/2$
+    in constant time.
+    So in an additional $O(n^2)$ time we can contruct the matrix $G$.
+
+    Clearly $G = X^T X$ where $X$ is the $d \times n$ matrix whose columns
+    are the vectors $x_i$ for $i \in [n]$.
+    Then $G$ is positive semi-definite and we can find $X$ either by
+    performing an eigenvalue decomposition or singular value decomposition.
+    The time complexity for both operations is an additional $O(n^3)$.
+\end{enumerate}
+
+
+
